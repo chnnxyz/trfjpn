@@ -17,6 +17,7 @@ class ReplayMemory(object):
     def __len__(self) -> int:
         return len(self.memory)
 
+    # TODO: fix types
     def push(self, *args: Any):
         self.memory.append(Transition(*args))
 
