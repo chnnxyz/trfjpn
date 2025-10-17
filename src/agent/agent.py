@@ -2,7 +2,7 @@ import random
 import math
 import torch
 
-from src.action.actions import ALL_ACTIONS
+from src.action.actions import ALL_ACTIONS, LEVER_ACTIONS, EATER_ACTIONS
 from src.common.configs import RunConfig
 from src.geometry.collision import (
     check_collision_with_lever,
@@ -30,8 +30,25 @@ class Agent:
             x=(self.state.x, self.state.x + 1), y=(self.state.y, self.state.y + 1)
         )
 
-    def _get_action_filter(self):
+    def _get_action_filter(self) -> list[int]:
         """Runs geometry heuristics to determine the list of allowed actions"""
+        disallowed_actions: list[str] = []
+        allow_mag_actions = True
+        if self.map.mag is not None:
+            allow_mag_actions = check_collision_with_mag(self, self.map.mag)
+        allow_lever_actions = any(
+            check_collision_with_lever(self, x) for x in self.map.levers
+        )
+
+        if not allow_mag_actions:
+            disallowed_actions += EATER_ACTIONS
+        if not allow_lever_actions:
+            disallowed_actions += LEVER_ACTIONS
+
+        disallowed_indices = [
+            v for k, v in self.all_actions.items() if k in disallowed_actions
+        ]
+        return disallowed_indices
 
     # def select_action(self):
     #     sample = random.random()
