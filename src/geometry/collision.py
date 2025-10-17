@@ -2,6 +2,7 @@ from src.agent.agent import Agent
 from src.map.lever import Lever
 from src.map.base_map import MapModel
 from src.map.mag import Mag
+from src.map.bounds import Bounds
 
 
 # Colissions against map
@@ -56,4 +57,26 @@ def check_collision_with_mag(agent: Agent, mag: Mag) -> bool:
 
 
 def check_collision_with_lever(agent: Agent, lever: Lever) -> bool:
-    return False
+    """Checks if the agent is adjacent to a lever.
+    Returns True if adjacent (touching or overlapping), otherwise False.
+    """
+
+    agent_bounds: Bounds = agent.bounds
+    lever_bounds: Bounds = lever.bounds
+
+    ax_min, ax_max = agent_bounds.x
+    ay_min, ay_max = agent_bounds.y
+    lx_min, lx_max = lever_bounds.x
+    ly_min, ly_max = lever_bounds.y
+
+    # Check for overlap or adjacency on both axes
+    x_adjacent = ax_max >= lx_min and ax_min <= lx_max
+    y_adjacent = ay_max >= ly_min and ay_min <= ly_max
+
+    if x_adjacent:
+        _solve_left_collision(agent, lx_min)
+    if y_adjacent:
+        _solve_top_collision(agent, ly_max)
+        _solve_bottom_collision(agent, ly_min)
+
+    return x_adjacent or y_adjacent
