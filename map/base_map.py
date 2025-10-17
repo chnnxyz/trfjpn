@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 class BaseMap:
     def __init__(
         self,
