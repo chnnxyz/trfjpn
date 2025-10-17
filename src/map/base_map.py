@@ -16,13 +16,7 @@ class MapModel:
     ):
         self.w: float = w
         self.h: float = h
-        self.l1y: float = l1y
-        self.l2y: float = l2y if l2y is not None else -999999.0
-        self.lw: float = lw
-        self.ey: float = ey if ey is not None else -999999.0
-
-    def init_state(self):
-        pass
-
-    def map_states_action(self):
-        pass
+        self.mag: Mag | None = None if ey is not None else Mag(ey, w, ew)
+        self.levers: list[Lever] = [Lever(l1y, lw, ld, w)]
+        if l2y is not None:
+            self.levers.append(Lever(l2y, lw, ld, w))

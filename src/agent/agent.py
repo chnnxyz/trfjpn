@@ -4,22 +4,34 @@ import torch
 
 from src.action.actions import ALL_ACTIONS
 from src.common.configs import RunConfig
+from src.geometry.collision import (
+    check_collision_with_lever,
+    check_collision_with_mag,
+    solve_mapbox_colissions,
+)
 from src.nn.dqn import DQN
 from src.state.general import State
 from src.map.bounds import Bounds
+from src.map.base_map import MapModel
 
 
 class Agent:
-    def __init__(self, initial_state: State, policy_net: DQN, nn_config: RunConfig):
+    def __init__(
+        self, initial_state: State, policy_net: DQN, nn_config: RunConfig, map: MapModel
+    ):
         self.state: State = initial_state
         self.policy_net: DQN = policy_net
         self.config: RunConfig = nn_config
+        self.map: MapModel = map
         self.all_actions: dict[str, int] = {
             ALL_ACTIONS[i]: i for i in range(len(ALL_ACTIONS))
         }
         self.bounds: Bounds = Bounds(
             x=(self.state.x, self.state.x + 1), y=(self.state.y, self.state.y + 1)
         )
+
+    def _get_action_filter(self):
+        """Runs geometry heuristics to determine the list of allowed actions"""
 
     # def select_action(self):
     #     sample = random.random()
