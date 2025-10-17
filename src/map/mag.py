@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from map.bounds import Bounds
+from src.map.bounds import Bounds
 
 
 @dataclass

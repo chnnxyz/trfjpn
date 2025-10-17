@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-from nn.config import LayerConfig
+from src.nn.config import LayerConfig
 
 
 class DQN(nn.Module):

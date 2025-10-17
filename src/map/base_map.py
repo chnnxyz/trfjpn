@@ -1,4 +1,8 @@
-class BaseMap:
+from src.map.lever import Lever
+from src.map.mag import Mag
+
+
+class MapModel:
     def __init__(
         self,
         w: float,

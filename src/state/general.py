@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import partial
-from typing import Callable, Self
+from typing import Callable
 
 from loss.hunger import linear_hunger
 
@@ -9,8 +9,8 @@ from loss.hunger import linear_hunger
 class State:
     """State of an agent including position, time, and reinforcement"""
 
-    x: int
-    y: int
+    x: int  # observable by agent
+    y: int  # observable by agent
     ticks: int = 0
     since_reinforcement: int = 0
     available_reinforcers: int = 0
