@@ -12,26 +12,11 @@ class State:
     x: float  # observable by agent
     y: float  # observable by agent
     ticks: int = 0
-    since_reinforcement: int = 0
+    trial_ticks: int = 0
     available_reinforcers: int = 0
     reinforcers: int = 0
     initial_hunger: float = 0
     hunger: float = initial_hunger
     hunger_function: Callable[..., float] | partial[float] = partial(
-        linear_hunger, a=1, b=1, h_0=initial_hunger
+        linear_hunger, a=0.2, b=20, h_0=initial_hunger
     )
-
-    def update_pos(self, x: int, y: int):
-        self.x = x
-        self.y = y
-        self.ticks += 1
-
-    def reinforce(self, n_reinf: int = 1):
-        self.reinforcers += n_reinf
-        self.since_reinforcement = 0
-
-    def update_hunger(self):
-        self.hunger = self.hunger_function(
-            t=self.ticks,
-            r_n=self.reinforcers,
-        )

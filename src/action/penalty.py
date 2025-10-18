@@ -5,10 +5,6 @@ from src.action.actions import (
     ALL_ACTIONS,
 )
 
-# head in 5
-# lever 7
-# move 8
-
 
 def _calculate_penalty(action: str) -> float:
     if action in INACTION:
