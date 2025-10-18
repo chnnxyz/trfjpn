@@ -24,6 +24,16 @@ def update_state(action: str, agent: Agent, trial_type: str):
             agent.map = deepcopy(agent.map_backup)
             agent.state.iti = random.randint(10, 30)
             agent.state.trial_ticks = 0
+            agent.state.trial_completed = False
+    else:
+        if agent.state.trial_ticks >= 30 * 5 * 3 + agent.state.iti:
+            agent.map = deepcopy(agent.map_backup)
+            agent.state.iti = random.randint(10, 30)
+            agent.state.trial_ticks = 0
+            agent.state.trial_completed = False
+        elif agent.state.trial_ticks >= 30 * 5 * 3:
+            agent.map.levers = []
+            agent.state.trial_completed = True
 
     if action in DIRECTIONAL_ACTIONS:
         if action == "LEFT":
