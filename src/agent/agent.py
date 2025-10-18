@@ -2,6 +2,8 @@ import random
 import math
 import torch
 
+from copy import deepcopy
+
 from src.action.actions import ALL_ACTIONS, LEVER_ACTIONS, EATER_ACTIONS
 from src.common.configs import RunConfig
 from src.geometry.collision import (
@@ -28,6 +30,7 @@ class Agent:
         self.policy_net: DQN = policy_net
         self.config: RunConfig = nn_config
         self.map: MapModel = map
+        self.map_backup: MapModel = deepcopy(map)
         self.device: torch.device = device
         self.all_actions: dict[str, int] = {
             ALL_ACTIONS[i]: i for i in range(len(ALL_ACTIONS))

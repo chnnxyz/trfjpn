@@ -1,5 +1,9 @@
 """Module to update state objects based o the selected action"""
 
+import random
+
+from copy import deepcopy
+
 from src.action.actions import (
     DIRECTIONAL_ACTIONS,
     LEVER_ACTIONS,
@@ -11,6 +15,16 @@ from src.agent.agent import Agent
 
 
 def update_state(action: str, agent: Agent, trial_type: str):
+    if trial_type == "FI":
+        if (
+            agent.state.trial_completed
+            and agent.state.trial_ticks - agent.state.completed_at
+            >= agent.state.iti * 5
+        ):
+            agent.map = deepcopy(agent.map_backup)
+            agent.state.iti = random.randint(10, 30)
+            agent.state.trial_ticks = 0
+
     if action in DIRECTIONAL_ACTIONS:
         if action == "LEFT":
             agent.state.x -= 0.175
@@ -32,6 +46,7 @@ def update_state(action: str, agent: Agent, trial_type: str):
                 agent.state.available_reinforcers += 1
                 # Remove lever
                 agent.map.levers = []
+                agent.state.trial_completed = True
     if action in EATER_ACTIONS:
         agent.state.reinforcers += agent.state.available_reinforcers
     # finally update the state to use the action penalty

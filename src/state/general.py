@@ -1,3 +1,5 @@
+import random
+
 from dataclasses import dataclass
 from functools import partial
 from typing import Callable
@@ -17,6 +19,9 @@ class State:
     reinforcers: int = 0
     initial_hunger: float = 0
     hunger: float = initial_hunger
+    trial_completed: bool = False
+    completed_at: int = 0
+    iti: int = random.randint(10, 30)
     hunger_function: Callable[..., float] | partial[float] = partial(
         linear_hunger, a=0.2, b=20, h_0=initial_hunger
     )
