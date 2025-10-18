@@ -175,7 +175,7 @@ class Agent:
                 disallowed = self._get_action_filter()
                 action = self.select_action(disallowed)
                 observation = self._get_observables_from_state()
-                reward = self.state.reinforcers - self.state.ticks
+                reward = -self.state.hunger
                 reward = torch.tensor([reward], device=self.device)
                 session = i
                 if self.state.ticks % 600 == 0:
@@ -205,6 +205,8 @@ class Agent:
                     self.state.trial_ticks,
                     self.state.trial_completed,
                     "FI",
+                    self.state.reinforcers,
+                    self.state.provided_reinf,
                     reward,
                 )
                 self.history.append(
@@ -217,6 +219,8 @@ class Agent:
                         self.state.trial_ticks,
                         self.state.trial_completed,
                         "FI",
+                        self.state.reinforcers,
+                        self.state.provided_reinf,
                         reward,
                     )
                 )

@@ -16,6 +16,8 @@ Transition = namedtuple(
         "trial_ticks",
         "trial_completed",
         "trial_type",
+        "reinforcers_taken",
+        "reinforcers_provided",
         "reward",
     ),
 )
