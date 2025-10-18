@@ -5,7 +5,19 @@ from typing import Any
 
 
 # TODO: Pyright types
-Transition = namedtuple("Transition", ("state", "action", "next_state", "reward"))
+Transition = namedtuple(
+    "Transition",
+    (
+        "state",
+        "action",
+        "next_state",
+        "ticks",
+        "trial_ticks",
+        "trial_completed",
+        "trial_type",
+        "reward",
+    ),
+)
 
 
 class ReplayMemory(object):
