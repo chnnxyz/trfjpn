@@ -11,6 +11,7 @@ Transition = namedtuple(
         "state",
         "action",
         "next_state",
+        "session",
         "ticks",
         "trial_ticks",
         "trial_completed",

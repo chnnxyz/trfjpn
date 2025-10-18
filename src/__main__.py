@@ -44,4 +44,4 @@ if __name__ == "__main__":
         optimizer=optim,
         target_net=target_net,
     )
-    torch.save(agent.policy_net, "dqn.pt")
+    agent.train(n_sessions=5, n_trials=5)

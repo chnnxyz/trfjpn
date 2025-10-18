@@ -3,8 +3,10 @@ import math
 import torch
 
 from copy import deepcopy
+from itertools import count
 
 from src.action.actions import ALL_ACTIONS, LEVER_ACTIONS, EATER_ACTIONS
+from src.action.update_state import update_state
 from src.common.configs import RunConfig
 from src.geometry.collision import (
     check_collision_with_lever,
@@ -31,6 +33,7 @@ class Agent:
         memory: ReplayMemory = ReplayMemory(10000),
     ):
         self.state: State = initial_state
+        self.initial_state = deepcopy(initial_state)
         self.policy_net: DQN = policy_net
         self.target_net: DQN = target_net
         self.optimizer = optimizer
@@ -147,3 +150,61 @@ class Agent:
         # In-place gradient clipping
         torch.nn.utils.clip_grad_value_(self.policy_net.parameters(), 100)
         self.optimizer.step()
+
+    def train(self, n_sessions: int, n_trials: int):
+        for i in range(n_sessions):
+            self.state = State(
+                x=random.uniform(0, self.map.w),
+                y=random.uniform(0, self.map.h),
+                initial_hunger=self.initial_state.initial_hunger,
+            )
+            state = self._get_observables_from_state()
+            state = torch.tensor(
+                state, dtype=torch.float32, device=self.device
+            ).unsqueeze(0)
+            for t in count():
+                disallowed = self._get_action_filter()
+                action = self.select_action(disallowed)
+                observation = state
+                reward = -1 * self.state.hunger
+                reward = torch.tensor([reward], device=self.device)
+                session = i
+                done = (
+                    self.state.ticks == 120 * 60 * 5
+                    or self.state.reinforcers == n_trials
+                )
+                str_action = [
+                    k for k, v in self.all_actions.items() if v == action[0].item()
+                ]
+                next_state = update_state(str_action[0], self, "FI")
+
+                # Store the transition in memory
+                self.memory.push(
+                    observation,
+                    action,
+                    self._get_observables_from_state(),
+                    i,
+                    self.state.ticks,
+                    self.state.trial_ticks,
+                    self.state.trial_completed,
+                    "FI",
+                    reward,
+                )
+
+                # Move to the next state
+                state = next_state
+
+                # Perform one step of the optimization (on the policy network)
+                self._optimize_model()
+
+                # Soft update of the target network's weights
+                # θ′ ← τ θ + (1 −τ )θ′
+                target_net_state_dict = self.target_net.state_dict()
+                policy_net_state_dict = self.policy_net.state_dict()
+                for key in policy_net_state_dict:
+                    target_net_state_dict[key] = policy_net_state_dict[
+                        key
+                    ] * self.config.TAU + target_net_state_dict[key] * (
+                        1 - self.config.TAU
+                    )
+                self.target_net.load_state_dict(target_net_state_dict)
