@@ -1,7 +1,7 @@
 import random
 import math
 import torch
-
+import time
 from copy import deepcopy
 from itertools import count
 
@@ -48,10 +48,13 @@ class Agent:
             x=(self.state.x, self.state.x + 1), y=(self.state.y, self.state.y + 1)
         )
         self.memory: ReplayMemory = memory
+        self.history: list[Transition] = []
 
     def _get_observables_from_state(self):
         """returns observable variables from state to use in NN"""
-        return torch.Tensor([self.state.x, self.state.y])
+        return torch.Tensor([[self.state.x, self.state.y, self.state.hunger]]).to(
+            self.device
+        )
 
     def _get_action_filter(self) -> list[int]:
         """Runs geometry heuristics to determine the list of allowed actions"""
@@ -152,7 +155,12 @@ class Agent:
         self.optimizer.step()
 
     def train(self, n_sessions: int, n_trials: int):
+        start_time = time.time()
+        end_time = time.time()
         for i in range(n_sessions):
+            end_time = time.time()
+            print(f"Training session {i}")
+            print(f"Previous session time {end_time - start_time}")
             self.state = State(
                 x=random.uniform(0, self.map.w),
                 y=random.uniform(0, self.map.h),
@@ -162,17 +170,26 @@ class Agent:
             state = torch.tensor(
                 state, dtype=torch.float32, device=self.device
             ).unsqueeze(0)
+            reinf = self.state.provided_reinf
             for t in count():
                 disallowed = self._get_action_filter()
                 action = self.select_action(disallowed)
-                observation = state
-                reward = -1 * self.state.hunger
+                observation = self._get_observables_from_state()
+                reward = self.state.reinforcers
                 reward = torch.tensor([reward], device=self.device)
                 session = i
+                if self.state.ticks % 600 == 0:
+                    print(f"tick {self.state.ticks}")
                 done = (
                     self.state.ticks == 120 * 60 * 5
-                    or self.state.reinforcers == n_trials
+                    or self.state.provided_reinf >= n_trials
                 )
+                if self.state.provided_reinf != reinf:
+                    print(f"reinforcers {self.state.provided_reinf}")
+                    reinf = self.state.provided_reinf
+                if done:
+                    start_time = time.time()
+                    break
                 str_action = [
                     k for k, v in self.all_actions.items() if v == action[0].item()
                 ]
@@ -183,14 +200,26 @@ class Agent:
                     observation,
                     action,
                     self._get_observables_from_state(),
-                    i,
+                    session,
                     self.state.ticks,
                     self.state.trial_ticks,
                     self.state.trial_completed,
                     "FI",
                     reward,
                 )
-
+                self.history.append(
+                    Transition(
+                        observation,
+                        action,
+                        self._get_observables_from_state(),
+                        session,
+                        self.state.ticks,
+                        self.state.trial_ticks,
+                        self.state.trial_completed,
+                        "FI",
+                        reward,
+                    )
+                )
                 # Move to the next state
                 state = next_state
 

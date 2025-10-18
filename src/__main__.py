@@ -44,4 +44,9 @@ if __name__ == "__main__":
         optimizer=optim,
         target_net=target_net,
     )
-    agent.train(n_sessions=5, n_trials=5)
+    agent.train(n_sessions=20, n_trials=60)
+
+    import pickle
+
+    with open("agent_trained.pkl", "wb") as f:
+        pickle.dump(agent, f)

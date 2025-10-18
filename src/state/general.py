@@ -17,6 +17,7 @@ class State:
     trial_ticks: int = 0
     available_reinforcers: int = 0
     reinforcers: int = 0
+    provided_reinf: int = 0
     initial_hunger: float = 0
     hunger: float = initial_hunger
     trial_completed: bool = False

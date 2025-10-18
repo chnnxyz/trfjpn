@@ -1,5 +1,9 @@
 """Module to update state objects based o the selected action"""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import random
 
 from copy import deepcopy
@@ -11,7 +15,9 @@ from src.action.actions import (
     EATER_ACTIONS,
 )
 from src.action.penalty import ACTION_PENALTIES
-from src.agent.agent import Agent
+
+if TYPE_CHECKING:
+    from src.agent.agent import Agent
 
 
 def update_state(action: str, agent: Agent, trial_type: str):
@@ -54,11 +60,14 @@ def update_state(action: str, agent: Agent, trial_type: str):
             if agent.state.trial_ticks * 5 >= 30:
                 # Increase available reinforcers
                 agent.state.available_reinforcers += 1
+                agent.state.provided_reinf += 1
                 # Remove lever
                 agent.map.levers = []
                 agent.state.trial_completed = True
     if action in EATER_ACTIONS:
         agent.state.reinforcers += agent.state.available_reinforcers
+        if agent.state.available_reinforcers > 0:
+            agent.state.available_reinforcers = 0
     # finally update the state to use the action penalty
     agent.state.hunger = agent.state.hunger_function(
         t=agent.state.ticks,
@@ -66,3 +75,4 @@ def update_state(action: str, agent: Agent, trial_type: str):
         penalty=0.2 * ACTION_PENALTIES[action],
     )
     agent.state.ticks += 1
+    agent.state.trial_ticks += 1
