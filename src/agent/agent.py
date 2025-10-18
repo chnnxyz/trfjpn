@@ -175,11 +175,11 @@ class Agent:
                 disallowed = self._get_action_filter()
                 action = self.select_action(disallowed)
                 observation = self._get_observables_from_state()
-                reward = self.state.reinforcers
+                reward = self.state.reinforcers - self.state.ticks
                 reward = torch.tensor([reward], device=self.device)
                 session = i
                 if self.state.ticks % 600 == 0:
-                    print(f"tick {self.state.ticks}")
+                    print(f"session minutes: {self.state.ticks / (5 * 60)}")
                 done = (
                     self.state.ticks == 120 * 60 * 5
                     or self.state.provided_reinf >= n_trials
