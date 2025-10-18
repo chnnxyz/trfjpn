@@ -16,7 +16,7 @@ class MapModel:
     ):
         self.w: float = w
         self.h: float = h
-        self.mag: Mag | None = None if ey is not None else Mag(ey, w, ew)
+        self.mag: Mag | None = None if ey is None else Mag(ey, w, ew)
         self.levers: list[Lever] = [Lever(l1y, lw, ld, w)]
         if l2y is not None:
             self.levers.append(Lever(l2y, lw, ld, w))

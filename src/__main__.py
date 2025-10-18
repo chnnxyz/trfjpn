@@ -1,10 +1,11 @@
 from torch.optim.adamw import AdamW
-from common.configs import load_config
+from src.common.configs import load_config
 from src.nn.config import LayerConfig
 from src.action.actions import ALL_ACTIONS
 from src.nn.dqn import DQN
 from src.nn.memory import ReplayMemory
 from src.nn.setup import setup_torch_device
+from src.agent.agent import Agent
 
 if __name__ == "__main__":
     cfg = load_config("./run_setup.yaml")

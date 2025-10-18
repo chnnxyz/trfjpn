@@ -1,8 +1,14 @@
-from src.agent.agent import Agent
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+
 from src.map.lever import Lever
-from src.map.base_map import MapModel
 from src.map.mag import Mag
 from src.map.bounds import Bounds
+
+if TYPE_CHECKING:
+    from src.agent.agent import Agent
 
 
 # Colissions against map
