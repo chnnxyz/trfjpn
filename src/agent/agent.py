@@ -86,14 +86,3 @@ class Agent:
 
         chosen: int = random.choice(allowed)
         return torch.tensor([[chosen]], device=self.device, dtype=torch.long)
-
-    # def select_action(self):
-    #     sample = random.random()
-    #     eps_th = self.config.EPS_END + (
-    #         self.config.EPS_START - self.config.EPS_END
-    #     ) * math.exp(-1.0 * self.state.ticks / self.config.EPS_DECAY)
-    #     self.state.ticks += 1
-    #     if sample > eps_th:
-    #         return self.policy_net(self.state).max(1).indices.view(1, 1)
-    #     else:
-    #         return torch.tensor([[env.action_space.sample()]], device=, dtype=torch.long)
